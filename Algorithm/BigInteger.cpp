@@ -32,11 +32,10 @@ BigInteger::BigInteger(long long n)
 // 构造函数
 BigInteger::BigInteger(std::string str)
 {
-    if (str == "") {
+    if (str == "")
         data = "0";
-    }
-        
-    data = str;
+    else
+        data = str;
 }
 
 // 拷贝构造函数
