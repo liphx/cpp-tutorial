@@ -7,7 +7,7 @@
 
 namespace {
 
-// 字符串相加，其中str参数符合BigInteger::data格式且均大于0，[1-9][0-9]* | 0
+// 字符串相加
 std::string add(std::string str1, std::string str2)
 {
     std::string ret;
@@ -92,6 +92,12 @@ std::string subtract(std::string str1, std::string str2)
     }
 
     std::reverse(ret.begin(), ret.end());
+
+    // 去掉前导0
+    int len = ret.length(), j;
+    for (j = 0; j < len && ret[j] == '0'; j++) ; 
+    ret = std::string(ret, j);
+
     return ret;
 }
 
@@ -133,6 +139,42 @@ std::string multiply(std::string str1, std::string str2)
     for (int i = 0; i < len2; i++) {
         ret = add(ret, multiply_char(str1, str2[len2 - 1 - i], i));
     }
+    return ret;
+}
+
+// 比较两个字符串大小，不带符号，若str1 < str2，返回true
+bool str_cmp(std::string str1, std::string str2)
+{
+    int len1 = str1.length(), len2 = str2.length();
+    return (len1 < len2) || (len1 == len2 && str1 < str2);
+}
+
+// 字符串相除
+std::string divide(std::string str1, std::string str2)
+{
+    if (str_cmp(str1, str2))
+        return "0";
+
+    std::string ret = "0";
+    int len1 = str1.length(), len2 = str2.length();
+    std::string tmp = std::string(str1, 0, len2); // 取和str2等长的字符串，判断商的位置
+    int i; // 表示商的位置
+    if (str_cmp(tmp, str2)) {
+        i = len2 + 1;
+    } else {
+        i = len2;
+    }
+
+    for (int j = 9; j >= 0; j--) {
+        tmp = multiply_char(str2, j + '0', str1.length() - i);
+        if (!str_cmp(str1, tmp)) {
+            ret = add(ret, (char)(j + '0') + std::string(str1.length() - i, '0'));
+            str1 = subtract(str1, tmp);
+            ret = add(ret, divide(str1, str2));
+            break;
+        }
+    }
+    
     return ret;
 }
 
@@ -371,5 +413,33 @@ BigInteger BigInteger::operator*(const BigInteger &bi) const
     BigInteger ret;
     ret.sign = (this->sign == bi.sign) ? 1 : -1;
     ret.data = ::multiply(this->data, bi.data);
+    return ret;
+}
+
+// 重载 /，除数为0将抛异常
+BigInteger BigInteger::operator/(const BigInteger &bi) const
+{
+    if (bi.sign == 0) { // 除数为0
+        throw(2);
+    }
+    if (this->sign == 0) { // 被除数为0
+        return BigInteger(0);
+    }
+
+    if (this->abs() < bi.abs()) { // 被除数的绝对值小于除数
+        return BigInteger(0);
+    }
+
+    BigInteger ret;
+    ret.sign = (this->sign == bi.sign) ? 1 : -1;
+    ret.data = ::divide(this->data, bi.data);
+    return ret;
+}
+
+BigInteger BigInteger::abs() const
+{
+    BigInteger ret(*this);
+    if (ret.sign < 0)
+        ret.sign = -ret.sign;
     return ret;
 }
