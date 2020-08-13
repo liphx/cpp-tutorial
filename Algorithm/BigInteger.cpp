@@ -436,10 +436,52 @@ BigInteger BigInteger::operator/(const BigInteger &bi) const
     return ret;
 }
 
+// 重载 %，除数为0将抛异常
+BigInteger BigInteger::operator%(const BigInteger &bi) const
+{
+    if (bi.sign == 0) { // 除数为0
+        throw(2);
+    }
+    return *this - ((*this / bi) * bi);
+}
+
 BigInteger BigInteger::abs() const
 {
     BigInteger ret(*this);
     if (ret.sign < 0)
         ret.sign = -ret.sign;
     return ret;
+}
+
+namespace {
+BigInteger _gcd(const BigInteger &a, const BigInteger &b)
+{
+        if (a < b) 
+            return _gcd(b, a);
+
+        if (b == 0) {
+            return a;
+        }
+        return _gcd(b, a % b);
+}
+
+} // namespace
+
+// 以这个函数为入口，a, b > 0
+BigInteger BigInteger::gcd(const BigInteger &a, const BigInteger &b)
+{
+    if (a <= 0 || b <= 0) {
+        throw(3);
+    }
+
+    return ::_gcd(a, b);
+}
+
+BigInteger BigInteger::lcm(const BigInteger &a, const BigInteger &b)
+{
+    if (a <= 0 || b <= 0) {
+        throw(3);
+    }
+
+    return a * b / gcd(a, b);
 }
