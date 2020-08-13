@@ -16,6 +16,7 @@ public:
     BigInteger operator+(const BigInteger &bi) const;
     BigInteger operator-(const BigInteger &bi) const;
     BigInteger operator*(const BigInteger &bi) const;
+    BigInteger operator/(const BigInteger &bi) const;
 
     bool operator==(const BigInteger &bi) const;
     bool operator<(const BigInteger &bi) const;
@@ -30,6 +31,7 @@ public:
 private:
     int sign;           // 符号位，1表示正数，-1表示负数，0代表0
     std::string data;   // 以字符串形式存储大整数，其中不包含符号位，有效的格式为[1-9][0-9]* | 0
+    BigInteger abs() const;
 };
 
 #endif
