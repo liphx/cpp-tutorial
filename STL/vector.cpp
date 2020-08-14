@@ -78,6 +78,7 @@ int main()
     // insert插入一个或多个元素
     data6.insert(data6.begin(), "00");
     data6.insert(data6.end(), { "11", "22" });
+    print(data6); // 00 ell hel 11 22
 
     // 删除尾部元素
     data6.pop_back();
